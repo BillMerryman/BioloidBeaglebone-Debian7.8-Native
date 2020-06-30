@@ -1,0 +1,66 @@
+download toolchain from http://gnutoolchains.com/beaglebone/ and install to C:\BBGCC
+had to copy libwinpthread-1.dll from C:\BBGCC\bin to C:\MinGW\bin
+run updatesysroot from C:\BBGCC\tools...
+
+copy opencv zips to folder at root and unzip
+In OpenCV/platforms/linux folder, create a 'build' folder
+copy CMakeCache.txt from native build on beaglebone to this folder
+update all of the /usr references to start with the path of sysroot (e.g. C:/BBGCC/arm-linux-gnueabihf/sysroot)
+update all of the references to the native desktop location to the local location (e.g. /root/Desktop/opencv to C:{pathToOpencv}
+update all of the build tool paths to be to the cross compiler (e.g. C:/BBGCC/bin)
+copy 'downloads' folder from BB opencv installation into C:\OpenCVCrossCompile\opencv-3.4.0\platforms\linux\build
+
+open Cmake GUI and point it at the build directory, configure, and build
+
+after this finishes, open a MinGW command  prompt (C:\MinGW\msys\1.0\msys.bat)
+change to the build directory
+run mingw32-make
+and then mingw32-make install
+
+Things that may require tweaking...
+
+*****
+
+C:\BB\usr\include\elf.h change #include <bits/auxv.h> to #include <arm-linux-gnueabihf/bits/auxv.h>
+
+*****
+
+edit libc.so and libpthread.so in C:\BBGCC\arm-linux-gnueabihf\sysroot\usr\lib\arm-linux-gnueabihf and remove the paths before the library names
+
+*****
+
+copy libpng12.so.0 in C:\BBGCC\arm-linux-gnueabihf\sysroot\usr\lib\arm-linux-gnueabihf and rename to libpng.so
+
+*****
+
+had to edit C:\BBGCC\arm-linux-gnueabihf\sysroot\usr\include\arm-linux-gnueabihf\bits\mathcalls.h to include this patch:
+
+diff --git a/math/bits/mathcalls.h b/math/bits/mathcalls.h
+index b82c373..a48345d 100644
+--- a/math/bits/mathcalls.h
++++ b/math/bits/mathcalls.h
+@@ -196,9 +196,11 @@  __MATHDECL_1 (int,__finite,, (_Mdouble_ __value)) __attribute__ ((__const__));
+ _Mdouble_END_NAMESPACE
+ 
+ #ifdef __USE_MISC
++# if !defined __cplusplus || __cplusplus < 201103L /* Conflicts with C++11.  */
+ /* Return 0 if VALUE is finite or NaN, +1 if it
+    is +Infinity, -1 if it is -Infinity.  */
+ __MATHDECL_1 (int,isinf,, (_Mdouble_ __value)) __attribute__ ((__const__));
++# endif
+ 
+ /* Return nonzero if VALUE is finite and not NaN.  */
+ __MATHDECL_1 (int,finite,, (_Mdouble_ __value)) __attribute__ ((__const__));
+@@ -230,8 +232,10 @@  __END_NAMESPACE_C99
+ __MATHDECL_1 (int,__isnan,, (_Mdouble_ __value)) __attribute__ ((__const__));
+ 
+ #if defined __USE_MISC || (defined __USE_XOPEN && !defined __USE_XOPEN2K)
++# if !defined __cplusplus || __cplusplus < 201103L /* Conflicts with C++11.  */
+ /* Return nonzero if VALUE is not a number.  */
+ __MATHDECL_1 (int,isnan,, (_Mdouble_ __value)) __attribute__ ((__const__));
++# endif
+ #endif
+ 
+ #if defined __USE_MISC || (defined __USE_XOPEN && __MATH_DECLARING_DOUBLE)
+
+from https://patches.linaro.org/patch/59550/

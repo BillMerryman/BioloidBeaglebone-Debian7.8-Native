@@ -1,0 +1,19 @@
+download 4.9.2 toolchain from http://gnutoolchains.com/beaglebone/ and install to C:\BBGCC
+Copy the 'TOOLS' directory from one of the other toolchains (either the 6.3.0 version or from the Raspberry Pi toolchain) into C:\BBGCC
+run updatesysroot from C:\BBGCC\tools...
+copy libpng12.so.0 in C:\BBGCC\arm-linux-gnueabihf\sysroot\usr\lib\arm-linux-gnueabihf and rename to libpng.so
+
+copy opencv zips to folder (preferably at root) and unzip
+In OpenCV/platforms/linux folder, create a 'build' folder
+copy CMakeCache.txt from native build on beaglebone to this folder
+update all of the /usr references to start with the path of sysroot (e.g. C:/BBGCC/arm-linux-gnueabihf/sysroot)
+update all of the references to the native desktop location to the local location (e.g. /root/Desktop/opencv to C:{pathToOpencv}
+update all of the build tool paths to be to the cross compiler (e.g. C:/BBGCC/bin)
+copy 'downloads' folder from BB opencv installation into C:\OpenCVCrossCompile\opencv-3.4.0\platforms\linux\build
+
+open Cmake GUI and point it at the build directory, configure, and build
+
+after this finishes, open a MinGW command  prompt (C:\MinGW\msys\1.0\msys.bat)
+change to the build directory
+run mingw32-make
+and then mingw32-make install

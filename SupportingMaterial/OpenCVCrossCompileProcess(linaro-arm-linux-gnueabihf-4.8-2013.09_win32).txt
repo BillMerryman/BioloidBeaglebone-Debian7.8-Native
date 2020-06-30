@@ -1,0 +1,23 @@
+in /opencv/platforms/linux create build folder
+open command prompt
+change to this folder
+from this folder run:
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -DCMAKE_TOOLCHAIN_FILE=../arm-gnueabi.toolchain.cmake ../../.. -G "MinGW Makefiles"
+it will fail the first time through, afterwards go to 
+C:\Users\Bill\Desktop\opencv-master\platforms\linux\Build
+open CMakeCache.txt
+make sure all of the unfilled paths (like CMAKE_CXX_COMPILER:FILEPATH=) are pointing to the cross compilers
+run command again
+after this finishes, open a MinGW command  prompt (C:\MinGW\msys\1.0\msys.bat)
+change to C:\Users\Bill\Desktop\opencv-master\platforms\linux\Build directory
+run mingw32-make
+and then mingw32-make install
+
+
+//had to modify include/opencv2/core/types_c.h to add:
+
+#include "opencv2/core/fast_math.hpp" 
+after
+#include "opencv2/core/cvdef.h" 
+
+for it to compile into project in opencv 3.4

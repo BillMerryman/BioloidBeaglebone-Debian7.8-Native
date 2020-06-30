@@ -1,0 +1,17 @@
+These files do the following:
+
+cape-universalx-00A0.dtbo - this is the compiled version of the device tree overlay file , cape-universalx-00A0.dts. Created using the DTBO compiler.
+
+cape-universalx-00A0.dts - this is the source version of the device tree overlay. It is a modified version of the univeral cape overlay, with added support for the PRU Uart (which wasn't available at the time, but has since been added)
+
+config-pin - this is a modified version of the config-pin script, with modifications to add support for the PRU Uart (which wasn't available at the time, but has since been added)
+
+overlayPinConfig.sh - this is a script that is run by the user before launching the main program. It does the following: loads the univeral IO and HDMI-disabling device tree overlays (sometimes referred to synonymously with capes); loads the UIO_PRUSS kernel driver and sets aside 2MB of system memory for use by the PRUs (because of a strange issue, it actually loads it, unloads it, and loads it again); configures all the pins necessary for PRU input, output, and UART; and configures one pin for PWM to drive the camera.
+
+To use these files:
+
+copy the config-pin script to opt/source/beaglebone-universal-io and make executable
+copy cape-universalx-00A0.dtbo to lib/firmware
+copy overlayPinConfig.sh to whatever directory you will be working from and make executable
+
+Before running the main BioloidBeaglebone program, you must at minimum do the above steps, and then execute the overlayPinConfig.sh (e.g. open a terminal window, switch to the directory where you placed overlayPinConfig.sh, type ./overlayPinConfig.sh, and press enter). This only needs to be done once, and should only be done once, preferrably right after booting has completed. You should also run GRB422-QVGA.sh from the CameraManipulationScripts folder if you are using the GRB422 QVGA version of the camera code, currently the default. This must be run after overlayPinConfig.sh or it will not work.

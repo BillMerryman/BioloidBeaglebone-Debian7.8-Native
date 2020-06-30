@@ -1,0 +1,125 @@
+login:root 
+
+----------- Enable wireless
+
+edit /etc/network/interfaces by adding:
+auto {interface name}
+allow-hotplug {interface name}
+iface {interface name} inet static
+    wpa-ssid ""
+    wpa-psk  ""
+    address 192.168.2.149
+    netmask 255.255.255.0
+    network 192.168.2.0
+    gateway 192.168.2.1
+    dns-nameserver 192.168.2.1
+
+----------- Update
+
+update /etc/apt/sources.list and replace ftp.us with archive, comment out the 'updates' entries
+apt-get update
+
+---------- Resize to fit SD card
+
+to resize the partition:
+fdisk /dev/mmcblk0
+d
+n
+p
+default
+8192
+default
+w
+resize2fs /dev/mmcblk0p1
+
+OR
+
+cd /opt/scripts/tools
+git pull
+./grow_partition.sh
+
+--------------disable HDMI and eMMC
+
+disable hdmi and emmc using the /boot/uEnv.txt file (uncomment the line):
+#cape_disable=capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN,BB-BONE-EMMC-2G
+
+---------------enable remote X without SSH
+
+enable remote X without SSH by going into /etc/lightdm/lightdm.conf and edit the XDMCP settings:
+[LightDM]
+start-default-seat=false
+[SeatDefaults]
+xserver-allow-tcp=true
+autologin-user=root
+[XDMCPServer]
+enabled=true
+port=177
+key=
+
+------------install custom device tree files
+
+copy modified config-pin script to (and make executable):
+opt/source/beaglebone-universal-io
+copy cape-universalx-00A0.dtbo to:
+lib/firmware
+
+------------to fix bad DOS line returns in scripts
+
+sed -i -e 's/\r$//' scriptname.sh
+
+------------to fix problem in opencv build
+
+The problem appears to be a bug in OpenCV. I edited opencv-3.0.0/modules/videoio/src/cap_ffmpeg_impl.hpp, replacing AVCodecID with CV_CODEC_ID in all places but the #define -- in lines 1174 (optional), 1546, and 1556 -- and the build worked.
+
+------------install opencv
+
+apt-get update
+apt-get install build-essential cmake pkg-config
+apt-get install libtiff4-dev libjpeg-dev libjasper-dev libpng12-dev
+apt-get install libavcodec-dev libavformat-dev libswscale-dev libv4l-dev 
+apt-get install unzip
+
+cd Desktop
+wget -O opencv-3.0.0.zip https://github.com/Itseez/opencv/archive/3.0.0.zip
+wget -O opencv_contrib-3.0.0.zip https://github.com/Itseez/opencv_contrib/archive/3.0.0.zip
+unzip opencv-3.0.0.zip
+unzip opencv_contrib-3.0.0.zip
+
+cd opencv-3.0.0
+mkdir build && cd build
+cmake -D CMAKE_BUILD_TYPE=RELEASE \
+-D CMAKE_INSTALL_PREFIX=/usr/local \
+-D OPENCV_EXTRA_MODULES_PATH=/root/Desktop/opencv_contrib-3.0.0/modules \
+-D WITH_CUDA=OFF \
+-D WITH_OPENCL=OFF \
+-D BUILD_opencv_apps=OFF \
+-D BUILD_DOCS=OFF \
+-D BUILD_PERF_TESTS=OFF \
+-D BUILD_TESTS=OFF \
+-D ENABLE_VFPV3=ON \
+-D ENABLE_NEON=ON \
+..
+
+free //check for swap file, if not present do the following:
+dd if=/dev/zero of=/var/swap.img bs=1024k count=1000 //this may take a while to run
+mkswap /var/swap.img
+chmod 600 /var/swap.img
+swapon /var/swap.img
+
+make
+make install
+ldconfig
+
+swapoff /var/swap.img //if you turned on the swap file previously
+rm /var/swap.img //to recover the 1GB of space
+
+------------PRU Compilation Support
+
+In .bashrc in your home directory, add:
+export PRU_CGT=/usr/share/ti/cgt-pru
+export PRU_SUPPORT=/opt/source/pru-software-support-package
+
+create a symlink named 'bin' in /usr/share/ti/cgt-pru to point to /usr/bin:
+ln -s /usr/bin /usr/share/ti/cgt-pru/bin
+
+------------Now follow the directions in the 'About' file in the Debian7.8StartupSupport folder
