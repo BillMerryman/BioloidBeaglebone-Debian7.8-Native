@@ -57,12 +57,15 @@ SOURCES=$(wildcard *.c)
 #Using .object instead of .obj in order to not conflict with the CCS build process
 OBJECTS=$(patsubst %,$(GEN_DIR)/%,$(SOURCES:.c=.object))
 
-all: printStart $(TARGET) printEnd
+all: printStart makeFolder $(TARGET) printEnd
 
 printStart:
 	@echo ''
 	@echo '************************************************************'
 	@echo 'Building project: $(PROJ_NAME)'
+	
+makeFolder:
+	-mkdir $(GEN_DIR)
 
 printEnd:
 	@echo ''
@@ -84,7 +87,6 @@ $(TARGET): $(OBJECTS) $(LINKER_COMMAND_FILE)
 
 # Invokes the compiler on all c files in the directory to create the object files
 $(GEN_DIR)/%.object: %.c
-	-mkdir $(GEN_DIR)
 	@echo ''
 	@echo 'Building file: $<'
 	@echo 'Invoking: PRU Compiler'
