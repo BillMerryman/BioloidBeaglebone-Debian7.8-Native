@@ -47,10 +47,10 @@ COBJ = \
  main.o \
  pru.o \
  prussdrv.o \
- motionManager.o  \
- visionManager.o
+ motionManager.o 
  
- CPPOBJ =
+ CPPOBJ = \
+ 	visionManager.o
 
 # gcc binaries to use
 CC = gcc
@@ -75,9 +75,6 @@ MSG_SUCCESS = ---SUCCESS---
 
 # Our favourite
 all: pru_bin $(PROJECT)
-
-#$(PROJECT):
-#	$(CP) $(CFLAGS) -o main main.c image.c  pru.c prussdrv.c
 
 # Linker call
 $(PROJECT): $(COBJ) $(CPPOBJ)

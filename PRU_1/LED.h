@@ -13,6 +13,8 @@
 #include "TI_Headers/hw_types.h"
 
 #define BANK_ADDRESS_FOR_LED_GPIOS		(SOC_GPIO_1_REGS)
+#define PIN_NUMBER_FOR_LED_0        	(21)
+#define PIN_NUMBER_FOR_LED_1        	(22)
 #define PIN_NUMBER_FOR_LED_2        	(23)
 #define PIN_NUMBER_FOR_LED_3        	(24)
 

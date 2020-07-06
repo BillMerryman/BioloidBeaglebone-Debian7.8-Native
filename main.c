@@ -12,38 +12,44 @@
  *
  */
 
-#include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <unistd.h>
 
 #include "cv.h"
 #include "highgui.h"
 #include "pru.h"
 #include "PRUInterop.h"
 #include "motionManager.h"
-#include "visionManager.h"
+#include "visionManager.hpp"
 
 int main (int argc, char *argv[])
 {
 
-	if(argc < 8)
+	if(argc < 6)
 	{
-		fprintf(stderr, "Usage: BioloidBeaglebone PRU0Firmware PRU1Firmware MotionFile MLProtoFile MLCaffeFile");
+		fprintf(stderr, "Usage: BioloidBeaglebone PRU0Firmware PRU1Firmware MotionFile");
 		return -1;
 	}
 
 	int key = 0;
 
+	const char *PRU_0Firmware_Text = argv[1];
+	const char *PRU_0Firmware_Data = argv[2];
+	const char *PRU_1Firmware_Text = argv[3];
+	const char *PRU_1Firmware_Data = argv[4];
+	const char *motionFile = argv[5];
+
 	initializePRU();
 
-	configurePRU_0(argv[1], argv[2]);
+	configurePRU_0(PRU_0Firmware_Text, PRU_0Firmware_Data);
 	startPRU_0();
-	configurePRU_1(argv[3], argv[4]);
+	configurePRU_1(PRU_1Firmware_Text, PRU_1Firmware_Data);
 	startPRU_1();
 
-	motionManagerInitialize(argv[5]);
-	visionManagerInitialize(argv[6], argv[7]);
+	motionManagerInitialize(motionFile);
+	visionManagerInitialize();
 
 	while(key != 'x')
 	{

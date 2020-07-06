@@ -26,6 +26,7 @@
  * 	the PRU that will be managing the actuators. It also currently loads the motion page
  * 	file into the portion of PRU allocated memory we set aside for that.
  *
+ *	@param	motionFile the file containing motion pages.
  * 	@return void.
  *
  */

@@ -8,9 +8,10 @@
 #include "image.h"
 #include "PRUInterop1.h"
 
+extern volatile unsigned int *imageReadyFlag;
 unsigned int *imageData;
 
-volatile register unsigned int __R31;
+volatile register uint32_t __R31;
 
 extern inline void imageInitialize(void)
 {
